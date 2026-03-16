@@ -105,11 +105,3 @@ savasan_iha_ws/src/
 ├── yolo_detector/       ← YOLO paketi → /detected_targets topic
 └── qr_reader/           ← QR paketi  → /qr_reader/result topic
 ```
-
-## Takım
-
-Sakarya Üniversitesi İHA Kulübü - Yazılım Ekibi
-
-## Lisans
-
-Bu proje TEKNOFEST 2026 yarışması kapsamında geliştirilmektedir.
