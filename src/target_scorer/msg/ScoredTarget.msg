@@ -1,0 +1,9 @@
+uint8 target_id
+float64 latitude
+float64 longitude
+float64 altitude
+float64 score
+float64 heading
+float64 speed
+bool is_locked_by_others
+bool is_blacklisted
