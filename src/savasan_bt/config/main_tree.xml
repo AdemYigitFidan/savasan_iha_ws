@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+
+  <BehaviorTree ID="MainTree">
+    <Fallback name="AnaKararVerici">
+
+      <!-- ==================== KURTARMA (En Yüksek Öncelik) ==================== -->
+      <Fallback name="Kurtarma">
+
+        <!-- Haberleşme 10 saniye koptu mu? → RTL başlat ve çember at -->
+        <Sequence name="HaberlesmeKopuklugu">
+          <Condition ID="HaberlesmeKoptuMu" name="HaberlesmeKoptuMu"/>
+          <Action ID="RTLBaslatVeCemberAt" name="RTLBaslatVeCemberAt"/>
+        </Sequence>
+
+        <!-- Kırmızı alana girdin mi? → Kaçınma moduna geç -->
+        <Sequence name="KirmiziAlanKacinma">
+          <Condition ID="KirmiziAlanaMiGirdin" name="KirmiziAlanaMiGirdin"/>
+          <Action ID="KacinmaModunaGec" name="KacinmaModunaGec"/>
+        </Sequence>
+
+        <!-- Sınır veya irtifa limiti aşıldı mı? → Güvenli bölgeye yönel -->
+        <Sequence name="SinirIhlali">
+          <Condition ID="SinirVeyaIrtifaAsildiMi" name="SinirVeyaIrtifaAsildiMi"/>
+          <Action ID="GuvenliBolgeyeYonel" name="GuvenliBolgeyeYonel"/>
+        </Sequence>
+
+      </Fallback>
+
+      <!-- ==================== KAMİKAZE GÖREVİ ==================== -->
+      <Sequence name="KamikazeGorevi">
+
+        <!-- Görev aktif mi kontrol -->
+        <Condition ID="KamikazeGoreviAktifMi" name="KamikazeGoreviAktifMi"/>
+
+        <!-- Otonom Kalkış -->
+        <Action ID="OtonomKalkis" name="OtonomKalkis"/>
+
+        <!-- Yeterli yükseklikte mi? (10m) - değilse yüksekliği arttır -->
+        <Fallback name="YukseklikKontrol_10m">
+          <Condition ID="YeterliYukseklikMi" name="YeterliYukseklikMi_10m"/>
+          <Action ID="Yuksekligi10mArttir" name="Yuksekligi10mArttir"/>
+        </Fallback>
+
+        <!-- QR konum bilgisi girildi mi? - değilse görev seçimi moduna geç -->
+        <Fallback name="QRKonumKontrol">
+          <Condition ID="QRKonumBilgisiGirildiMi" name="QRKonumBilgisiGirildiMi"/>
+          <Action ID="GorevSecimiModunaGec" name="GorevSecimiModunaGec"/>
+        </Fallback>
+
+        <!-- Konuma ilerle -->
+        <Action ID="KonumaIlerle" name="KonumaIlerle"/>
+
+        <!-- Yükseklik 100m veya üzeri mi? - değilse tırman -->
+        <Fallback name="YukseklikKontrol_100m">
+          <Condition ID="Yukseklik100mVeyaUzeriMi" name="Yukseklik100mVeyaUzeriMi"/>
+          <Action ID="Yuz100mOlanaKadarTirman" name="Yuz100mOlanaKadarTirman"/>
+        </Fallback>
+
+        <!-- Dalışa geç -->
+        <Action ID="DalisaGec" name="DalisaGec"/>
+
+        <!-- QR arama ve dalış döngüsü -->
+        <Fallback name="QRTespitVeDalis">
+
+          <!-- QR görüntüde mi? → Ortala, Tara, Yaklaşım kontrolü -->
+          <Sequence name="QRBulundu">
+            <Condition ID="QRGoruntudeMi" name="QRGoruntudeMi"/>
+            <Action ID="QRiOrtala" name="QRiOrtala"/>
+            <Action ID="KoduTaraVeKayitAl" name="KoduTaraVeKayitAl"/>
+
+            <!-- Hedefe yeterince yaklaştın mı? -->
+            <Fallback name="YaklasimKontrol">
+              <Sequence name="YeterliYaklasim">
+                <Condition ID="HedefeXKadarYaklastinMi" name="HedefeXKadarYaklastinMi"/>
+                <Action ID="DalisiSonlandirGuvenliYuksekligeGik" name="DalisiSonlandirGuvenliYuksekligeGik"/>
+                <Action ID="PaketleriSunucuyaIlet" name="PaketleriSunucuyaIlet"/>
+                <Action ID="QRKonumBilgisiniTemizle" name="QRKonumBilgisiniTemizle"/>
+              </Sequence>
+              <!-- Henüz yaklaşmadıysa dalışı sürdür -->
+              <Action ID="DalisiSurdur" name="DalisiSurdur"/>
+            </Fallback>
+          </Sequence>
+
+          <!-- QR görüntüde değilse -->
+          <Fallback name="QRBulunamadi">
+            <!-- Yükseklik 10m üzeri mi? Dalışı sürdür : Pas geç -->
+            <Sequence name="DalisDevam">
+              <Condition ID="Yukseklik10mVeyaUzeriMi" name="Yukseklik10mVeyaUzeriMi"/>
+              <Action ID="DalisiSurdur" name="DalisiSurdur_2"/>
+            </Sequence>
+            <Action ID="PasGec" name="PasGec"/>
+          </Fallback>
+
+        </Fallback>
+
+        <!-- Otonom İniş -->
+        <Action ID="OtonomInis" name="OtonomInis"/>
+
+      </Sequence>
+
+      <!-- ==================== SAVAŞAN GÖREVİ (Arkadaşların ekleyecek) ==================== -->
+      <Sequence name="SavasanGorevi">
+        <Condition ID="SavasanGoreviAktifMi" name="SavasanGoreviAktifMi"/>
+        <!-- TODO: Savaşan görevi subtree buraya eklenecek -->
+        <Action ID="PlaceholderSavasan" name="PlaceholderSavasan"/>
+      </Sequence>
+
+    </Fallback>
+  </BehaviorTree>
+
+  <!-- ==================== NODE TANIMLARI ==================== -->
+  <TreeNodesModel>
+    <!-- Conditions -->
+    <Condition ID="HaberlesmeKoptuMu"/>
+    <Condition ID="KirmiziAlanaMiGirdin"/>
+    <Condition ID="SinirVeyaIrtifaAsildiMi"/>
+    <Condition ID="KamikazeGoreviAktifMi"/>
+    <Condition ID="YeterliYukseklikMi"/>
+    <Condition ID="QRKonumBilgisiGirildiMi"/>
+    <Condition ID="Yukseklik100mVeyaUzeriMi"/>
+    <Condition ID="QRGoruntudeMi"/>
+    <Condition ID="HedefeXKadarYaklastinMi"/>
+    <Condition ID="Yukseklik10mVeyaUzeriMi"/>
+    <Condition ID="SavasanGoreviAktifMi"/>
+
+    <!-- Actions -->
+    <Action ID="RTLBaslatVeCemberAt"/>
+    <Action ID="KacinmaModunaGec"/>
+    <Action ID="GuvenliBolgeyeYonel"/>
+    <Action ID="OtonomKalkis"/>
+    <Action ID="Yuksekligi10mArttir"/>
+    <Action ID="GorevSecimiModunaGec"/>
+    <Action ID="KonumaIlerle"/>
+    <Action ID="Yuz100mOlanaKadarTirman"/>
+    <Action ID="DalisaGec"/>
+    <Action ID="QRiOrtala"/>
+    <Action ID="KoduTaraVeKayitAl"/>
+    <Action ID="DalisiSonlandirGuvenliYuksekligeGik"/>
+    <Action ID="PaketleriSunucuyaIlet"/>
+    <Action ID="QRKonumBilgisiniTemizle"/>
+    <Action ID="DalisiSurdur"/>
+    <Action ID="PasGec"/>
+    <Action ID="OtonomInis"/>
+    <Action ID="PlaceholderSavasan"/>
+  </TreeNodesModel>
+
+</root>
