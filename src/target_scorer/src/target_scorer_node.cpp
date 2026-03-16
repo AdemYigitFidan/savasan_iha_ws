@@ -11,7 +11,7 @@ TargetScorerNode::TargetScorerNode()
       our_heading_(0.0), our_speed_(0.0),
       gps_ready_(false), last_locked_id_(255)
 {
-    // Sunucu telemetrisini dinle (arkadaşlarının simülasyonu)
+    // Sunucu telemetrisini dinle
     sunucu_sub_ = this->create_subscription<std_msgs::msg::String>(
         "/sunucu_telemetri", 10,
         std::bind(&TargetScorerNode::sunucuTelemetriCallback, this, std::placeholders::_1));
